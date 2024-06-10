@@ -32,7 +32,7 @@ public class SearchViewModel extends ViewModel {
     public void searchImages(String query, int startPage) {
         searchClient.getSearch(query, startPage, response -> {
             if (response != null) {
-                if (DEBUG) Log.d("SearchViewModel", "Raw response: " + response.toString());
+                if (DEBUG) Log.d("SearchViewModel", "Raw response: " + response);
                 try {
                     JSONArray items = response.getJSONArray("images");
                     List<ImageResult> results = ImageResult.fromJSONArray(items);
