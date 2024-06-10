@@ -18,6 +18,7 @@ public class SearchViewModel extends ViewModel {
 
     private final MutableLiveData<List<ImageResult>> searchResults;
     private final SearchClient searchClient;
+    private static final boolean DEBUG = false; // Set to true for debugging
 
     public SearchViewModel(String apiKey) {
         searchResults = new MutableLiveData<>();
@@ -31,19 +32,19 @@ public class SearchViewModel extends ViewModel {
     public void searchImages(String query, int startPage) {
         searchClient.getSearch(query, startPage, response -> {
             if (response != null) {
-                Log.d("SearchViewModel", "Raw response: " + response.toString());
+                if (DEBUG) Log.d("SearchViewModel", "Raw response: " + response.toString());
                 try {
                     JSONArray items = response.getJSONArray("images");
                     List<ImageResult> results = ImageResult.fromJSONArray(items);
                     searchResults.postValue(results);
-                    Log.d("SearchViewModel", "Fetched " + results.size() + " items.");
+                    if (DEBUG) Log.d("SearchViewModel", "Fetched " + results.size() + " items.");
                 } catch (Exception e) {
                     searchResults.postValue(new ArrayList<>());
-                    Log.e("SearchViewModel", "Error parsing JSON", e);
+                    if (DEBUG) Log.e("SearchViewModel", "Error parsing JSON", e);
                 }
             } else {
                 searchResults.postValue(new ArrayList<>());
-                Log.e("SearchViewModel", "No response from server.");
+                if (DEBUG) Log.e("SearchViewModel", "No response from server.");
             }
             return null;
         });
