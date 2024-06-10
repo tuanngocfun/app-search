@@ -6,8 +6,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
 import android.webkit.URLUtil;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,17 +22,20 @@ import androidx.fragment.app.FragmentTransaction;
 import com.edu.homeedu.puzzle.image_search.R;
 import com.edu.homeedu.puzzle.image_search.models.ImageResult;
 import com.edu.homeedu.puzzle.image_search.ui.fragments.ImageSliderFragment;
+import com.edu.homeedu.puzzle.image_search.ui.utils.OnImageSlideListener;
 import com.edu.homeedu.puzzle.image_search.utils.BundleCompat;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class ImageDisplayActivity extends AppCompatActivity implements ImageSliderFragment.OnImageChangeListener  {
+public class ImageDisplayActivity extends AppCompatActivity implements OnImageSlideListener {
     private static final String TAG = "ImageDisplayActivity";
     private ArrayList<ImageResult> imageResults;
     private int startPosition;
     private Button btnOpenSource;
+    private ImageView imageView;
+    private FrameLayout fragmentContainer;
     private static final boolean DEBUG = false; // Set to true for debugging
 
     @Override
@@ -51,6 +56,8 @@ public class ImageDisplayActivity extends AppCompatActivity implements ImageSlid
         }
 
         btnOpenSource = findViewById(R.id.btnOpenSource);
+        imageView = findViewById(R.id.ivResult);
+        fragmentContainer = findViewById(R.id.fragment_container);
 
         Intent intent = getIntent();
         if (intent != null) {
@@ -68,7 +75,7 @@ public class ImageDisplayActivity extends AppCompatActivity implements ImageSlid
                 }
             }
             // Set the transition name on the target view
-            ImageView imageView = findViewById(R.id.ivResult);
+
             if (imageView != null && transitionName != null) {
                 imageView.setTransitionName(transitionName);
                 Log.d(TAG, "Transition name set to: " + transitionName);
@@ -99,7 +106,8 @@ public class ImageDisplayActivity extends AppCompatActivity implements ImageSlid
             Log.d(TAG, "ImageSliderFragment loaded");
 
             // Use ivResult for the shared element transition setup
-            ImageView imageView = findViewById(R.id.ivResult);
+            imageView.setVisibility(View.GONE);
+            fragmentContainer.setVisibility(View.VISIBLE);
             setupSharedElementTransition(imageView, startPosition);
         }
     }
@@ -132,14 +140,17 @@ public class ImageDisplayActivity extends AppCompatActivity implements ImageSlid
     }
 
     private void loadFallbackView(ImageResult imageResult) {
-        ImageView ivImage = findViewById(R.id.ivResult);
         TextView tvImageName = findViewById(R.id.tvImageName);
 
         if (imageResult != null) {
             String url = imageResult.getFullUrl();
-            setupSharedElementTransition(ivImage, startPosition);
-            loadImage(ivImage, url, this::startPostponedEnterTransition);
+            setupSharedElementTransition(imageView, startPosition);
+            loadImage(imageView, url, this::startPostponedEnterTransition);
             tvImageName.setText(imageResult.getTitle());
+
+            // Show the ImageView and hide the ViewPager
+            imageView.setVisibility(View.VISIBLE);
+            fragmentContainer.setVisibility(View.GONE);
         } else {
             tvImageName.setText(R.string.error_no_image);
             Log.d(TAG, "No image result received in intent");
@@ -147,7 +158,9 @@ public class ImageDisplayActivity extends AppCompatActivity implements ImageSlid
     }
 
     @Override
-    public void onImageChanged(ImageResult newImageResult) {
+
+    public void onImageSlide(ImageResult newImageResult) {
+        loadImage(imageView, newImageResult.getFullUrl(), null);
         setupSourceButton(newImageResult.getLink());
     }
 

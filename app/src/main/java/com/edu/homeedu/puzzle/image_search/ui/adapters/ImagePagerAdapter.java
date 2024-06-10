@@ -1,7 +1,6 @@
 package com.edu.homeedu.puzzle.image_search.ui.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,20 +12,21 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.edu.homeedu.puzzle.image_search.R;
 import com.edu.homeedu.puzzle.image_search.models.ImageResult;
-import com.edu.homeedu.puzzle.image_search.ui.activities.ImageDisplayActivity;
+import com.edu.homeedu.puzzle.image_search.ui.utils.OnImageSlideListener;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ImagePagerAdapter extends RecyclerView.Adapter<ImagePagerAdapter.ViewHolder> {
 
     private final List<ImageResult> imageUrls;
     private final Context context;
+    private final OnImageSlideListener imageSlideListener;
 
-    public ImagePagerAdapter(List<ImageResult> imageUrls, Context context) {
+    public ImagePagerAdapter(List<ImageResult> imageUrls, Context context, OnImageSlideListener imageSlideListener) {
         this.imageUrls = imageUrls;
         this.context = context;
+        this.imageSlideListener = imageSlideListener;
     }
 
     @NonNull
@@ -47,10 +47,9 @@ public class ImagePagerAdapter extends RecyclerView.Adapter<ImagePagerAdapter.Vi
                 ViewGroup.LayoutParams.MATCH_PARENT));
 
         holder.ivPagerImage.setOnClickListener(v -> {
-            Intent intent = new Intent(context, ImageDisplayActivity.class);
-            intent.putExtra("image_list", (ArrayList<ImageResult>) imageUrls);
-            intent.putExtra("start_position", position);
-            context.startActivity(intent);
+            if (imageSlideListener != null) {
+                imageSlideListener.onImageSlide(imageUrl);
+            }
         });
     }
 

@@ -15,6 +15,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.edu.homeedu.puzzle.image_search.R;
 import com.edu.homeedu.puzzle.image_search.models.ImageResult;
 import com.edu.homeedu.puzzle.image_search.ui.adapters.ImagePagerAdapter;
+import com.edu.homeedu.puzzle.image_search.ui.utils.OnImageSlideListener;
 import com.edu.homeedu.puzzle.image_search.utils.BundleCompat;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class ImageSliderFragment extends Fragment {
     private static final String ARG_START_POSITION = "start_position";
     private ArrayList<ImageResult> imageList;
     private int startPosition;
+    private OnImageSlideListener imageSlideListener;
 
     public static ImageSliderFragment newInstance(ArrayList<ImageResult> imageList, int startPosition) {
         ImageSliderFragment fragment = new ImageSliderFragment();
@@ -34,12 +36,6 @@ public class ImageSliderFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
-    public interface OnImageChangeListener {
-        void onImageChanged(ImageResult newImageResult);
-    }
-
-    private OnImageChangeListener imageChangeListener;
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
@@ -63,17 +59,17 @@ public class ImageSliderFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (context instanceof OnImageChangeListener) {
-            imageChangeListener = (OnImageChangeListener) context;
+        if (context instanceof OnImageSlideListener) {
+            imageSlideListener = (OnImageSlideListener) context;
         } else {
-            throw new RuntimeException(context + " must implement OnImageChangeListener");
+            throw new RuntimeException(context + " must implement OnImageSlideListener");
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        imageChangeListener = null;
+        imageSlideListener = null;
     }
 
     @Nullable
@@ -82,7 +78,7 @@ public class ImageSliderFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_image_slider, container, false);
         ViewPager2 viewPager = view.findViewById(R.id.viewPager);
 
-        ImagePagerAdapter adapter = new ImagePagerAdapter(imageList, getContext());
+        ImagePagerAdapter adapter = new ImagePagerAdapter(imageList, getContext(), imageSlideListener);
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(startPosition, false);
 
@@ -95,8 +91,8 @@ public class ImageSliderFragment extends Fragment {
                     SharedPreferences preferences = context.getSharedPreferences("image_prefs", Context.MODE_PRIVATE);
                     preferences.edit().putInt("current_position", position).apply();
                 }
-                if (imageChangeListener != null) {
-                    imageChangeListener.onImageChanged(imageList.get(position));
+                if (imageSlideListener  != null) {
+                    imageSlideListener .onImageSlide(imageList.get(position));
                 }
             }
         });
