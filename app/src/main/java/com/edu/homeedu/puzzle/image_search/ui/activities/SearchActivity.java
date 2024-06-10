@@ -47,13 +47,13 @@ public class SearchActivity extends AppCompatActivity  {
     private SearchViewModel viewModel;
 
     private ExecutorService executorService;
-
     private Handler searchHandler;
     private Runnable searchRunnable;
     private final ArrayList<ImageResult> imageResults = new ArrayList<>();
     private  RecyclerView rvResults;
     private ProgressBar progressBar;
     private int currentPage = 1;
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +72,7 @@ public class SearchActivity extends AppCompatActivity  {
         viewModel = new ViewModelProvider(this, factory).get(SearchViewModel.class);
         viewModel.getSearchResults().observe(this, this::onSearchResults);
 
-        SharedPreferences preferences = getSharedPreferences("image_prefs", MODE_PRIVATE);
+        preferences = getSharedPreferences("image_prefs", MODE_PRIVATE);
         String lastQuery = preferences.getString("last_query", "");
         String imageResultsJson = preferences.getString("image_results", "");
 
@@ -132,7 +132,6 @@ public class SearchActivity extends AppCompatActivity  {
             }
         });
 
-        // Restore the scroll position
     }
 
     @Override
@@ -178,6 +177,7 @@ public class SearchActivity extends AppCompatActivity  {
         if (results != null && !results.isEmpty()) {
             imageResults.addAll(results);
             adapter.addResults(results);
+            cacheResults(); // Cache the updated results
             Log.d(TAG, "Results updated with " + results.size() + " items.");
         } else if (adapter.getItemCount() == 0) { // Only show message if adapter is empty
             Toast.makeText(this, "No results found", Toast.LENGTH_SHORT).show();
@@ -207,7 +207,7 @@ public class SearchActivity extends AppCompatActivity  {
             searchHandler.removeCallbacks(searchRunnable);
         }
         searchRunnable = () -> onImageSearch(start);
-        searchHandler.postDelayed(searchRunnable, 300);  // 300ms delay
+        searchHandler.postDelayed(searchRunnable, 500);  // 500ms delay to ensure proper debounce
         Log.d(TAG, "debounceSearch called with start: " + start);
     }
 
@@ -229,6 +229,7 @@ public class SearchActivity extends AppCompatActivity  {
                 executorService.submit(() -> {
                     Log.d(TAG, "Executing search in background for query: " + query);
                     viewModel.searchImages(query, start);
+                    prefetchNextPage(query, start + 10);
                 });
             } else {
                 Toast.makeText(this, R.string.invalid_query, Toast.LENGTH_SHORT).show();
@@ -240,6 +241,19 @@ public class SearchActivity extends AppCompatActivity  {
             Log.d(TAG, "No internet connection.");
             progressBar.setVisibility(View.GONE); // Hide if no internet connection
         }
+    }
+
+    private void prefetchNextPage(String query, int nextPage) {
+        if (nextPage <= MAX_PAGE * 10) { //within max range
+            Log.d(TAG, "Prefetching next page: " + nextPage);
+            viewModel.searchImages(query, nextPage);
+        }
+    }
+
+    private void cacheResults() {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("image_results", new Gson().toJson(imageResults));
+        editor.apply();
     }
 
     private ArrayList<ImageResult> getImageResults() {
