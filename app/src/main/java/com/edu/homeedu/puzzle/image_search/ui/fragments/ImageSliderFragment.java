@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 public class ImageSliderFragment extends Fragment {
 
+    // These constants remain as they are used for bundle arguments
     private static final String ARG_IMAGE_LIST = "image_list";
     private static final String ARG_START_POSITION = "start_position";
     private ArrayList<ImageResult> imageList;
@@ -88,8 +89,8 @@ public class ImageSliderFragment extends Fragment {
                 super.onPageSelected(position);
                 Context context = getContext();
                 if (context != null) {
-                    SharedPreferences preferences = context.getSharedPreferences("image_prefs", Context.MODE_PRIVATE);
-                    preferences.edit().putInt("current_position", position).apply();
+                    SharedPreferences preferences = context.getSharedPreferences(getString(R.string.image_prefs), Context.MODE_PRIVATE);
+                    preferences.edit().putInt(getString(R.string.current_position), position).apply();
                 }
                 if (imageSlideListener  != null) {
                     imageSlideListener .onImageSlide(imageList.get(position));

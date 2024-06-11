@@ -61,10 +61,10 @@ public class ImageDisplayActivity extends AppCompatActivity implements OnImageSl
 
         Intent intent = getIntent();
         if (intent != null) {
-            imageResults = (ArrayList<ImageResult>) BundleCompat.getSerializable(intent, "image_list", ArrayList.class);
-            startPosition = intent.getIntExtra("start_position", 0);
-            String query = intent.getStringExtra("query");
-            String transitionName = intent.getStringExtra("transition_name");
+            imageResults = (ArrayList<ImageResult>) BundleCompat.getSerializable(intent, getString(R.string.image_list), ArrayList.class);
+            startPosition = intent.getIntExtra(getString(R.string.start_position), 0);
+            String query = intent.getStringExtra(getString(R.string.query));
+            String transitionName = intent.getStringExtra(getString(R.string.transition_name));
             if (DEBUG) Log.d(TAG, "Received intent with start position: " + startPosition);
             if (DEBUG) Log.d(TAG, "Query: " + query);
             if (DEBUG) Log.d(TAG, "Transition name: " + transitionName);
@@ -134,7 +134,7 @@ public class ImageDisplayActivity extends AppCompatActivity implements OnImageSl
     }
 
     private void setupSharedElementTransition(ImageView imageView, int position) {
-        imageView.setTransitionName("imageTransition" + position);
+        imageView.setTransitionName(getString(R.string.imageTransition) + position);
         postponeEnterTransition();
         startPostponedEnterTransition();
     }
@@ -184,7 +184,7 @@ public class ImageDisplayActivity extends AppCompatActivity implements OnImageSl
     }
 
     private void loadFallbackViewFromIntent() {
-        ImageResult imageResult = getIntent().getSerializableExtra("image_list", ImageResult.class);
+        ImageResult imageResult = getIntent().getSerializableExtra(getString(R.string.image_list), ImageResult.class);
         loadFallbackView(imageResult);
         if (imageResult != null) {
             setupSourceButton(imageResult.getLink());
@@ -207,15 +207,15 @@ public class ImageDisplayActivity extends AppCompatActivity implements OnImageSl
     }
 
     private void navigateBackToSearchActivity() {
-        SharedPreferences preferences = getSharedPreferences("image_prefs", MODE_PRIVATE);
-        int currentPosition = preferences.getInt("current_position", startPosition);
+        SharedPreferences preferences = getSharedPreferences(getString(R.string.image_prefs), MODE_PRIVATE);
+        int currentPosition = preferences.getInt(getString(R.string.current_position), startPosition);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("current_position", currentPosition);
+        editor.putInt(getString(R.string.current_position), currentPosition);
         editor.apply();
 
         Intent intent = new Intent(this, SearchActivity.class);
-        intent.putExtra("current_position", currentPosition);
-        intent.putExtra("query", getIntent().getStringExtra("query"));
+        intent.putExtra(getString(R.string.current_position), currentPosition);
+        intent.putExtra(getString(R.string.query), getIntent().getStringExtra(getString(R.string.query)));
         startActivity(intent);
         Log.d(TAG, "Navigating back to SearchActivity with position: " + currentPosition);
         finish();

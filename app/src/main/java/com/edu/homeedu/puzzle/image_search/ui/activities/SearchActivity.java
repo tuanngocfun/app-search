@@ -67,14 +67,13 @@ public class SearchActivity extends AppCompatActivity  {
 
         setupViews();
 
-        String apiKey = "da467c94e8f3d33a86ee93b48cf7d76800ab5b77";
-        SearchViewModelFactory factory = new SearchViewModelFactory(apiKey);
+        SearchViewModelFactory factory = new SearchViewModelFactory(getString(R.string.api_key));
         viewModel = new ViewModelProvider(this, factory).get(SearchViewModel.class);
         viewModel.getSearchResults().observe(this, this::onSearchResults);
 
-        preferences = getSharedPreferences("image_prefs", MODE_PRIVATE);
-        String lastQuery = preferences.getString("last_query", "");
-        String imageResultsJson = preferences.getString("image_results", "");
+        preferences = getSharedPreferences(getString(R.string.image_prefs), MODE_PRIVATE);
+        String lastQuery = preferences.getString(getString(R.string.last_query), "");
+        String imageResultsJson = preferences.getString(getString(R.string.image_results), "");
 
         if (!lastQuery.isEmpty() && !imageResultsJson.isEmpty()) {
             etQuery.setText(lastQuery);
@@ -156,10 +155,10 @@ public class SearchActivity extends AppCompatActivity  {
     @Override
     protected void onPause() {
         super.onPause();
-        SharedPreferences preferences = getSharedPreferences("image_prefs", MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences(getString(R.string.image_prefs), MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("last_query", etQuery.getText().toString());
-        editor.putString("image_results", new Gson().toJson(imageResults));
+        editor.putString(getString(R.string.last_query), etQuery.getText().toString());
+        editor.putString(getString(R.string.image_results), new Gson().toJson(imageResults));
         editor.apply();
     }
 
@@ -252,7 +251,7 @@ public class SearchActivity extends AppCompatActivity  {
 
     private void cacheResults() {
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("image_results", new Gson().toJson(imageResults));
+        editor.putString(getString(R.string.image_results), new Gson().toJson(imageResults));
         editor.apply();
     }
 
@@ -263,10 +262,10 @@ public class SearchActivity extends AppCompatActivity  {
     private void onImageItemClick(ImageResult imageResult, int position, View sharedImageView) {
         if (imageResult != null) {
             Intent intent = new Intent(this, ImageDisplayActivity.class);
-            intent.putExtra("image_list", getImageResults());
-            intent.putExtra("start_position", position);
-            intent.putExtra("query", etQuery.getText().toString());
-            intent.putExtra("transition_name", sharedImageView.getTransitionName());
+            intent.putExtra(getString(R.string.image_list), getImageResults());
+            intent.putExtra(getString(R.string.start_position), position);
+            intent.putExtra(getString(R.string.query), etQuery.getText().toString());
+            intent.putExtra(getString(R.string.transition_name), sharedImageView.getTransitionName());
 
             Log.d(TAG, "Starting shared element transition with name: " + sharedImageView.getTransitionName());
 

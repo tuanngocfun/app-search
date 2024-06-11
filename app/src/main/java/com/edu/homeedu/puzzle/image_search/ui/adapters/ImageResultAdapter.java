@@ -60,7 +60,7 @@ public class ImageResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     .into(itemViewHolder.imageView);
             itemViewHolder.textView.setText(imageResult.getTitle());
 
-            String transitionName = "imageTransition" + position;
+            String transitionName = holder.itemView.getContext().getString(R.string.imageTransition) + position;
             itemViewHolder.imageView.setTransitionName(transitionName);
 
             itemViewHolder.itemView.setOnClickListener(v -> {
