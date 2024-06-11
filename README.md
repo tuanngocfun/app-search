@@ -51,3 +51,11 @@ To clone the repository, follow these steps:
     - Ensure the SDK Location is set correctly.
     - Go to **File > Settings > Appearance & Behavior > System Settings > Android SDK**.
     - Check the required SDK platforms and tools and click **Apply**.
+
+## Build and Run the Project
+
+1. To build the project, click on the **Build** menu and select **Make Project**.
+2. To run the project on an emulator or a connected device, click on the **Run** menu and select **Run 'app'**.
+    - Ensure you have a configured device or emulator. You can set up an emulator by going to **AVD Manager** and creating a new virtual device.
+3. Select the target device and click **OK**.
+    - The project will build and deploy to the selected device or emulator.
