@@ -59,3 +59,15 @@ To clone the repository, follow these steps:
     - Ensure you have a configured device or emulator. You can set up an emulator by going to **AVD Manager** and creating a new virtual device.
 3. Select the target device and click **OK**.
     - The project will build and deploy to the selected device or emulator.
+
+## Project Features
+
+- [x] Implement search field at the top for query text input.
+- [x] Display resulting images in a collection view (RecyclerView with GridLayoutManager).
+- [x] Open an image in full screen view on preview image tap.
+- [x] Allow users to swipe images for navigation in full screen view.
+- [x] Add a button to open the original source page in an external browser or Chrome Custom Tab.
+- [x] Implement shared element transitions between list and detail screens.
+- [x] Implement pagination for loading more images on scroll.
+- [x] Cache images on the device.
+- [x] Use serper.dev API to get Google search results in JSON format.
